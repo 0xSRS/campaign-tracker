@@ -1,0 +1,19 @@
+# Virtual environment
+.venv/
+
+# Python
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Local secrets and settings
+.env
+
+# Local state (database, imports, logs)
+data/*
+!data/.gitkeep
+
+# Editors / OS
+.vscode/
+.DS_Store
+Thumbs.db

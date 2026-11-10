@@ -1,0 +1,20 @@
+Screen {
+    background: $surface;
+}
+
+#dashboard {
+    padding: 1 2;
+}
+
+#title {
+    text-style: bold;
+    color: $accent;
+    margin-bottom: 1;
+}
+
+.card {
+    border: round $primary;
+    padding: 1 2;
+    margin-bottom: 1;
+    height: auto;
+}

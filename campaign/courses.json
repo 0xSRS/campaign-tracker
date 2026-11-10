@@ -1,0 +1,15 @@
+{
+  "campaign_name": "Learn With Communities",
+  "courses": [
+    {"name": "The Basics of Google Cloud Compute", "template_id": 754},
+    {"name": "Configure Service Accounts and IAM Roles for Google Cloud", "template_id": 702},
+    {"name": "Implement Speech and Language Solutions with Pre-trained APIs", "template_id": 700},
+    {"name": "Develop AI-Powered Prototypes in Google AI Studio", "template_id": 1426},
+    {"name": "Analyze Images with the Cloud Vision API", "template_id": 633},
+    {"name": "Build a Website on Google Cloud", "template_id": 638},
+    {"name": "Create Your First Gemini Enterprise Application", "template_id": 1586},
+    {"name": "Store, Process, and Manage Data on Google Cloud - Console", "template_id": 658},
+    {"name": "Using the Google Cloud Speech API", "template_id": 756},
+    {"name": "Explore Generative AI in Agent Platform", "template_id": 959}
+  ]
+}
