@@ -27,10 +27,15 @@ class Settings(BaseSettings):
     # --- Logging -------------------------------------------------------------
     log_level: str = "INFO"
 
-    # --- Networking (used in a later module) -----------------------------------
-    request_timeout_seconds: float = Field(default=20.0, gt=0)
+     # --- Networking ------------------------------------------------------------
+    request_timeout_seconds: float = Field(default=20.0, gt=0)  # read timeout
+    fetch_connect_timeout_seconds: float = Field(default=10.0, gt=0)
     max_retries: int = Field(default=2, ge=0, le=10)
-
+    fetch_retry_backoff_seconds: float = Field(default=0.5, ge=0)
+    fetch_max_redirects: int = Field(default=5, ge=0, le=10)
+    fetch_max_response_bytes: int = Field(default=2_000_000, gt=0)
+    user_agent: str = "LearnWithCommunitiesCampaignTracker/0.1 (public-profile check)"
+    
     @field_validator("log_level")
     @classmethod
     def _validate_log_level(cls, value: str) -> str:
