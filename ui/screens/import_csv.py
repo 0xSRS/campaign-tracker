@@ -2,11 +2,15 @@
 
 from __future__ import annotations
 
+import asyncio
+from pathlib import Path
+
 from textual.binding import Binding
 from textual.containers import Horizontal
 from textual.widgets import Button, DataTable, Input, Label, Static
 
 from ui.modals import FilePickerModal
+from ui.native_dialog import pick_csv_file
 from ui.screens.base import TrackerScreen
 
 
@@ -46,7 +50,18 @@ class ImportScreen(TrackerScreen):
         self.action_preview()
 
     def action_browse(self) -> None:
-        self.app.push_screen(FilePickerModal(), self._picked)
+        self.run_worker(self._browse(), exclusive=True, group="browse")
+
+    async def _browse(self) -> None:
+        try:
+            path = await asyncio.to_thread(pick_csv_file)
+        except Exception as exc:
+            self.app.notify(str(exc), title="Explorer dialog unavailable", severity="warning")
+            downloads = Path.home() / "Downloads"
+            start = downloads if downloads.is_dir() else Path.home()
+            self.app.push_screen(FilePickerModal(start), self._picked)
+            return
+        self._picked(path)
 
     def _picked(self, path: str | None) -> None:
         if path:
