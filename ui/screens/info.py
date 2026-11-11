@@ -1,9 +1,12 @@
-"""Export (preparation only; files arrive in Module 10) and Settings screens."""
+"""Export and Settings screens."""
 
 from __future__ import annotations
 
+from pathlib import Path
+
 from textual.widgets import Button, DataTable, Label, Static
 
+from services.exporter import ReportExporter, ReportKind
 from ui.navigation import NAV
 from ui.screens.base import TrackerScreen
 
@@ -13,29 +16,49 @@ class ExportScreen(TrackerScreen):
 
     def compose_body(self):
         yield Label("Export reports", id="title")
-        yield Static("Loading…", id="e-info")
+        yield Static("Loading…", id="e-info", markup=False)
         yield DataTable(id="e-table", cursor_type="row")
-        yield Button("Export (coming in Module 10)", id="export", disabled=True)
+        yield Button("Export all reports (CSV)", id="export", disabled=True)
+        yield Static("", id="e-result", markup=False)
 
     def on_mount(self) -> None:
         self.query_one("#e-table", DataTable).add_columns("Report", "Rows ready")
 
+    def _exporter(self) -> ReportExporter:
+        s = self.app.services.settings
+        folder = getattr(s, "export_dir", None) or Path(s.database_path).parent / "exports"
+        return ReportExporter(self.app.services.reports, folder)
+
     async def load(self) -> None:
-        r = self.app.services.reports
-        data = await self.fetch(lambda: {
-            "Student summary": len(r.student_summary()), "Course-wise completion": len(r.course_completion()),
-            "Failed verification records": len(r.failed_records()),
-            "Missing certifications": len(r.missing_certifications())})
+        exporter = self._exporter()
+        data = await self.fetch(lambda: {k: len(exporter.build(k)[1]) for k in ReportKind})
         if not self.is_attached:
             return
         table = self.query_one("#e-table", DataTable)
         table.clear()
-        for name, n in data.items():
-            table.add_row(name, str(n))
-        empty = data["Student summary"] == 0
+        for kind, n in data.items():
+            table.add_row(kind.label, str(n))
+        empty = data[ReportKind.STUDENT_SUMMARY] == 0
         self.query_one("#e-info", Static).update(
             "Nothing to export yet — import and verify students first." if empty
-            else "Data is ready. File export is implemented in Module 10.")
+            else f"Reports are saved as CSV in: {exporter.output_dir}. Existing files are never overwritten.")
+        self.query_one("#export", Button).disabled = empty
+
+    async def on_button_pressed(self, event: Button.Pressed) -> None:
+        if event.button.id != "export":
+            return
+        event.stop()
+        event.button.disabled = True
+        try:
+            results = await self.fetch(self._exporter().export_all)
+        except Exception as exc:  # shown as a notification; details go to diagnostics
+            self.app.report_error(exc, "exporting reports")
+        else:
+            self.query_one("#e-result", Static).update(
+                "Saved:\n" + "\n".join(f"{r.path}  ({r.rows} rows)" for r in results))
+            self.notify(f"Exported {len(results)} reports.")
+        finally:
+            event.button.disabled = False
 
 
 class SettingsScreen(TrackerScreen):

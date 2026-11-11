@@ -23,6 +23,7 @@ class Settings(BaseSettings):
     # --- Paths ---------------------------------------------------------------
     data_dir: Path = BASE_DIR / "data"
     campaign_file: Path = BASE_DIR / "campaign" / "courses.json"
+    export_dir: Path = BASE_DIR / "data" / "exports"
 
     # --- Logging -------------------------------------------------------------
     log_level: str = "INFO"
