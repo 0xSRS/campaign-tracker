@@ -17,7 +17,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
-from core.constants import VerificationMode
+from core.constants import VerificationMode, VerificationStatus
 from database import (
     CampaignRepository,
     Database,
@@ -27,6 +27,7 @@ from database import (
     ImportStoreResult,
     ProfileInput,
     StudentRepository,
+    VerificationInput,
     VerificationRepository,
 )
 from scraper.batch import BatchState, VerificationBatch
@@ -80,6 +81,18 @@ class VerificationService:
         """Sync config -> DB (deactivates dropped courses, never deletes history)."""
         with self._db.session_scope() as s:
             return CampaignRepository(s).sync_from_config(self._campaign).id
+
+    def mark_private(self, student_id: int) -> None:
+        """Operator override: append a manual PRIVATE_INACCESSIBLE record (history is kept)."""
+        if self._running:
+            raise RunInProgressError("A verification run is active; try again when it finishes.")
+        campaign_id = self.ensure_campaign()
+        with self._db.session_scope() as s:
+            VerificationRepository(s).record(VerificationInput(
+                student_id=student_id, campaign_id=campaign_id,
+                status=VerificationStatus.PRIVATE_INACCESSIBLE, mode=VerificationMode.MANUAL,
+                error_category="manual_private",
+                diagnostic_message="Marked private/inaccessible manually after checking the profile in a browser."))
 
     # -- import (never scrapes) ----------------------------------------------
     def preview_csv(self, source: Path | str, *, is_text: bool = False) -> Any:

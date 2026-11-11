@@ -27,6 +27,7 @@ _CATEGORY_TEXT = {
     "redirected_to_login": "Profile is private or requires sign-in",
     "not_found": "Profile not found (HTTP 404)",
     "unexpected_error": "Unexpected error",
+    "manual_private": "Marked private manually",
 }
 
 
