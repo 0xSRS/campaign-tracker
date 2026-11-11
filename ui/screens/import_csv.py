@@ -16,8 +16,8 @@ from ui.screens.base import TrackerScreen
 
 class ImportScreen(TrackerScreen):
     NAV = "import"
-    BINDINGS = [Binding("ctrl+o", "browse", "Browse"), Binding("ctrl+p", "preview", "Preview"),
-                Binding("ctrl+i", "confirm", "Import")]
+    BINDINGS = [Binding("f3", "browse", "Browse"), Binding("f4", "preview", "Preview"),
+                Binding("f5", "confirm", "Import")]
 
     def __init__(self) -> None:
         super().__init__()
