@@ -34,6 +34,17 @@ class Settings(BaseSettings):
     fetch_retry_backoff_seconds: float = Field(default=0.5, ge=0)
     fetch_max_redirects: int = Field(default=5, ge=0, le=10)
     fetch_max_response_bytes: int = Field(default=2_000_000, gt=0)
+    
+        # --- Request control (conservative defaults; our own choices, not official Google limits) ---
+    request_delay_seconds: float = Field(default=2.0, ge=0)
+    max_concurrency: int = Field(default=1, ge=1, le=3)
+    retry_base_backoff_seconds: float = Field(default=2.0, ge=0)
+    retry_max_backoff_seconds: float = Field(default=60.0, ge=0)
+    retry_jitter: float = Field(default=0.25, ge=0, le=1)
+    rate_limit_default_pause_seconds: float = Field(default=60.0, ge=0)
+    rate_limit_max_pause_seconds: float = Field(default=300.0, ge=0)
+    max_rate_limit_retries: int = Field(default=1, ge=0, le=3)
+    
     user_agent: str = "LearnWithCommunitiesCampaignTracker/0.1 (public-profile check)"
     
     @field_validator("log_level")
