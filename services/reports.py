@@ -63,6 +63,31 @@ class CampaignStatistics:
     completion_rate: float | None  # completed / evaluated, as a percentage
     average_courses_completed: float | None
 
+@dataclass(frozen=True, slots=True)
+class CourseState:
+    course_name: str
+    completed: bool | None  # None = never successfully evaluated
+
+
+@dataclass(frozen=True, slots=True)
+class HistoryEntry:
+    verified_at: datetime
+    status: V
+    error_category: str | None
+
+
+@dataclass(frozen=True, slots=True)
+class StudentDetail:
+    student_id: int
+    url: str
+    latest_status: V | None
+    last_verified_at: datetime | None
+    error_category: str | None
+    diagnostic: str | None
+    evaluated_status: V | None
+    evaluation_is_current: bool
+    courses: tuple[CourseState, ...]
+    history: tuple[HistoryEntry, ...]
 
 class CampaignReports:
     def __init__(self, database: Database, campaign: Any) -> None:
@@ -143,3 +168,24 @@ class CampaignReports:
                 registered, never, by_status, evaluated, completed, incomplete,
                 round(100 * completed / evaluated, 1) if evaluated else None,
                 round(total_done / evaluated, 2) if evaluated else None)
+            
+    def student_detail(self, student_id: int) -> StudentDetail | None:
+        with self._db.session_scope() as s:
+            cid = self._campaign_id(s)
+            st = StudentRepository(s).get(student_id)
+            if st is None:
+                return None
+            vr = VerificationRepository(s)
+            att, ev = vr.latest_attempt(student_id, cid), vr.latest_evaluated(student_id, cid)
+            if ev is not None:
+                courses = tuple(CourseState(r.certification.course_name, bool(r.is_completed))
+                                for r in vr.results(ev.id))
+            else:
+                courses = tuple(CourseState(c.course_name, None)
+                                for c in CampaignRepository(s).active_certifications(cid))
+            history = tuple(HistoryEntry(h.verified_at, h.status, h.error_category)
+                            for h in vr.history(student_id, cid))
+            return StudentDetail(
+                st.id, st.normalized_url, att.status if att else None, att.verified_at if att else None,
+                att.error_category if att else None, att.diagnostic_message if att else None,
+                ev.status if ev else None, bool(att and ev and att.id == ev.id), courses, history)

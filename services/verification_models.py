@@ -90,6 +90,7 @@ class ProgressSnapshot:
     needs_review: int
     remaining: int
     error: str | None = None
+    last_profile: str | None = None  # most recently processed profile URL
 
 
 @dataclass(frozen=True, slots=True)

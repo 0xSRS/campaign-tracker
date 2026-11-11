@@ -38,6 +38,9 @@ class InvalidProfileURLError(CsvImportError):
 class DatabaseError(CampaignTrackerError):
     """A database operation failed."""
 
+# --- Export ------------------------------------------------------------------
+class ExportError(CampaignTrackerError):
+    """A report could not be prepared or written."""
 
 # --- Scraping ----------------------------------------------------------------
 class ScraperError(CampaignTrackerError):

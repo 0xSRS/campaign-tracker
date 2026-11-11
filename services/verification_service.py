@@ -82,6 +82,11 @@ class VerificationService:
             return CampaignRepository(s).sync_from_config(self._campaign).id
 
     # -- import (never scrapes) ----------------------------------------------
+    def preview_csv(self, source: Path | str, *, is_text: bool = False) -> Any:
+        """Validate + classify a CSV (new / existing / duplicate / invalid) WITHOUT storing anything."""
+        return self._csv.import_text(str(source)) if is_text else self._csv.import_file(source)
+
+    
     def import_csv(self, source: Path | str, *, is_text: bool = False) -> ImportReport:
         result = self._csv.import_text(str(source)) if is_text else self._csv.import_file(source)
         campaign_id = self.ensure_campaign()
@@ -148,7 +153,7 @@ class VerificationService:
                     rec = VerificationRepository(s).record(vi)
                     rec_id = rec.id
                 record_ids.append(rec_id)
-                tracker.record(vi.status)
+                tracker.record(vi.status, outcome.url)
 
             outcomes = await batch.run([(sid, url) for sid, url in urls.items()], store)
         except Exception as exc:

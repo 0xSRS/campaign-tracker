@@ -1,20 +1,31 @@
-Screen {
-    background: $surface;
-}
+Screen { background: $surface; }
 
-#dashboard {
-    padding: 1 2;
-}
+#shell { height: 1fr; }
+#nav { width: 30; border: round $primary; margin: 0 1; }
+.-narrow #nav { display: none; }
+#content { width: 1fr; padding: 0 1; overflow-y: auto; }
 
-#title {
-    text-style: bold;
-    color: $accent;
-    margin-bottom: 1;
-}
+#title { text-style: bold; color: $accent; margin: 1 0; }
+.section { text-style: bold; color: $secondary; margin: 1 0 0 0; }
+.dim { color: $text-muted; }
+.notice { border: round $warning; padding: 0 1; height: auto; margin: 0 0 1 0; }
+.row { height: auto; margin: 1 0; }
+.row Button { margin-right: 1; }
+.row Input { width: 1fr; margin-right: 1; }
 
-.card {
-    border: round $primary;
-    padding: 1 2;
-    margin-bottom: 1;
-    height: auto;
-}
+#cards, #v-counts { grid-size: 4; grid-gutter: 1; height: auto; margin-bottom: 1; }
+.stat { border: round $primary; padding: 0 1; height: 4; content-align: center middle; text-align: center; }
+.stat.ok { border: round $success; }
+.stat.warn { border: round $warning; }
+.stat.bad { border: round $error; }
+
+DataTable { height: auto; max-height: 20; margin-bottom: 1; }
+#students, #records { height: 1fr; max-height: 100%; }
+ProgressBar { margin: 1 0; }
+
+.dialog { width: 64; height: auto; max-height: 80%; padding: 1 2; border: thick $primary; background: $panel; }
+.dialog.wide { width: 90%; height: 80%; }
+.dialog-title { text-style: bold; color: $accent; margin-bottom: 1; }
+.dialog-buttons { height: auto; margin-top: 1; }
+.dialog-buttons Button { margin-right: 1; }
+ConfirmModal, DetailModal, FilePickerModal, DiagnosticsScreen { align: center middle; }

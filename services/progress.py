@@ -22,12 +22,13 @@ class ProgressTracker:
         self._mode, self._total, self._listener = mode, total, listener
         self._counts = dict.fromkeys(_BUCKET.values(), 0)
         self._state, self._error = "idle", None
+        self._last: str | None = None
 
     def snapshot(self) -> ProgressSnapshot:
         processed = sum(self._counts.values())
         return ProgressSnapshot(mode=self._mode, state=self._state, total_selected=self._total,
                                 processed=processed, remaining=self._total - processed,
-                                error=self._error, **self._counts)
+                                error=self._error, last_profile=self._last, **self._counts)
 
     def _emit(self) -> None:
         if self._listener is None:
@@ -41,7 +42,8 @@ class ProgressTracker:
         self._state = "running"
         self._emit()
 
-    def record(self, status: V) -> None:
+    def record(self, status: V, profile: str | None = None) -> None:
+        self._last = profile or self._last
         self._counts[_BUCKET[status]] += 1
         self._emit()
 
