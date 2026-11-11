@@ -37,8 +37,8 @@ class Settings(BaseSettings):
     fetch_max_response_bytes: int = Field(default=2_000_000, gt=0)
     
         # --- Request control (conservative defaults; our own choices, not official Google limits) ---
-    request_delay_seconds: float = Field(default=2.0, ge=0)
-    max_concurrency: int = Field(default=1, ge=1, le=3)
+    request_delay_seconds: float = Field(default=0.2, ge=0)
+    max_concurrency: int = Field(default=2, ge=1, le=3)
     retry_base_backoff_seconds: float = Field(default=2.0, ge=0)
     retry_max_backoff_seconds: float = Field(default=60.0, ge=0)
     retry_jitter: float = Field(default=0.25, ge=0, le=1)

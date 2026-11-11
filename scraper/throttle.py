@@ -25,8 +25,8 @@ class AcquireCancelled(Exception):
 @dataclass(frozen=True, slots=True)
 class ThrottleConfig:
     # Our own conservative defaults, NOT an official Google Skills limit.
-    min_interval_seconds: float = 2.0
-    max_concurrency: int = 1
+    min_interval_seconds: float = 0.2
+    max_concurrency: int = 2
 
     def __post_init__(self) -> None:
         if self.min_interval_seconds < 0:
